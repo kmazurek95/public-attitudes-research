@@ -610,10 +610,10 @@ ui <- dashboardPage(
             width = 6,
             h4("Portfolio Materials"),
             tags$ul(
-              tags$li(a("Project Summary", href = "https://github.com/kmazurek95/attitudes-toward-income-inequality/blob/main/PROJECT_SUMMARY.md", target = "_blank")),
-              tags$li(a("Case Study", href = "https://github.com/kmazurek95/attitudes-toward-income-inequality/blob/main/docs/portfolio/CASE_STUDY.md", target = "_blank")),
-              tags$li(a("Skills Matrix", href = "https://github.com/kmazurek95/attitudes-toward-income-inequality/blob/main/docs/portfolio/SKILLS_MATRIX.md", target = "_blank")),
-              tags$li(a("Business Value", href = "https://github.com/kmazurek95/attitudes-toward-income-inequality/blob/main/docs/portfolio/BUSINESS_VALUE.md", target = "_blank"))
+              tags$li(a("Project Summary", href = "https://github.com/kmazurek95/public-attitudes-research/blob/main/PROJECT_SUMMARY.md", target = "_blank")),
+              tags$li(a("Case Study", href = "https://github.com/kmazurek95/public-attitudes-research/blob/main/docs/portfolio/CASE_STUDY.md", target = "_blank")),
+              tags$li(a("Skills Matrix", href = "https://github.com/kmazurek95/public-attitudes-research/blob/main/docs/portfolio/SKILLS_MATRIX.md", target = "_blank")),
+              tags$li(a("Business Value", href = "https://github.com/kmazurek95/public-attitudes-research/blob/main/docs/portfolio/BUSINESS_VALUE.md", target = "_blank"))
             )
           ),
           box(
@@ -622,10 +622,10 @@ ui <- dashboardPage(
             width = 6,
             h4("Full Documentation"),
             tags$ul(
-              tags$li(a("Full Paper", href = "https://github.com/kmazurek95/attitudes-toward-income-inequality/blob/main/docs/academic/DRAFT_PAPER.md", target = "_blank")),
-              tags$li(a("Literature Review", href = "https://github.com/kmazurek95/attitudes-toward-income-inequality/blob/main/docs/academic/LITERATURE_REVIEW.md", target = "_blank")),
-              tags$li(a("Technical Overview", href = "https://github.com/kmazurek95/attitudes-toward-income-inequality/blob/main/docs/technical/TECHNICAL_OVERVIEW.md", target = "_blank")),
-              tags$li(a("Reproducibility Guide", href = "https://github.com/kmazurek95/attitudes-toward-income-inequality/blob/main/docs/technical/REPRODUCIBILITY.md", target = "_blank"))
+              tags$li(a("Full Paper", href = "https://github.com/kmazurek95/public-attitudes-research/blob/main/docs/academic/DRAFT_PAPER.md", target = "_blank")),
+              tags$li(a("Literature Review", href = "https://github.com/kmazurek95/public-attitudes-research/blob/main/docs/academic/LITERATURE_REVIEW.md", target = "_blank")),
+              tags$li(a("Technical Overview", href = "https://github.com/kmazurek95/public-attitudes-research/blob/main/docs/technical/TECHNICAL_OVERVIEW.md", target = "_blank")),
+              tags$li(a("Reproducibility Guide", href = "https://github.com/kmazurek95/public-attitudes-research/blob/main/docs/technical/REPRODUCIBILITY.md", target = "_blank"))
             )
           )
         ),
@@ -673,7 +673,7 @@ ui <- dashboardPage(
               "github_link",
               "GitHub Repository",
               icon = icon("github"),
-              onclick = "window.open('https://github.com/kmazurek95/attitudes-toward-income-inequality', '_blank')"
+              onclick = "window.open('https://github.com/kmazurek95/public-attitudes-research', '_blank')"
             ),
             actionButton(
               "python_link",

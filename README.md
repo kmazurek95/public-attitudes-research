@@ -80,7 +80,7 @@ See [docs/PIPELINE_ALIGNMENT.md](docs/PIPELINE_ALIGNMENT.md) for details on how 
 ## Project Structure
 
 ```
-attitudes-toward-income-inequality/
+public-attitudes-research/
 │
 ├── R/                          # R implementation (targets pipeline)
 │   ├── 00_packages.R           # Package dependencies

@@ -204,7 +204,7 @@ st.header("Full Documentation")
 
 st.markdown("View complete documentation on GitHub:")
 
-GITHUB_BASE = "https://github.com/kmazurek95/attitudes-toward-income-inequality/blob/main"
+GITHUB_BASE = "https://github.com/kmazurek95/public-attitudes-research/blob/main"
 
 col1, col2 = st.columns(2)
 
@@ -277,7 +277,7 @@ with col2:
     st.markdown("### Links")
     st.link_button(
         "GitHub Repository",
-        "https://github.com/kmazurek95/attitudes-toward-income-inequality",
+        "https://github.com/kmazurek95/public-attitudes-research",
         use_container_width=True
     )
     st.link_button(
