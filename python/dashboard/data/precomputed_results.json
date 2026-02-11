@@ -1,0 +1,137 @@
+{
+  "summary_stats": {
+    "n_obs": 8013,
+    "n_complete": 4748,
+    "n_buurten": 1572,
+    "n_wijken": 869,
+    "n_gemeenten": 295,
+    "dv_mean": 70.79,
+    "dv_sd": 27.41
+  },
+  "two_level": {
+    "icc": 0.0347,
+    "pct_between": 3.47,
+    "pct_within": 96.53,
+    "n_obs": 4748,
+    "n_clusters": 1572,
+    "models": {
+      "m0": {
+        "name": "Empty Model",
+        "coef": null,
+        "se": null,
+        "significant": null
+      },
+      "m1": {
+        "name": "+ Key Predictor",
+        "coef": 3.459,
+        "se": 0.417,
+        "significant": true
+      },
+      "m2": {
+        "name": "+ Individual Controls",
+        "coef": 2.939,
+        "se": 0.405,
+        "significant": true
+      },
+      "m3": {
+        "name": "+ Buurt Controls",
+        "coef": 0.276,
+        "se": 0.947,
+        "significant": false
+      }
+    }
+  },
+  "four_level": {
+    "icc_buurt": 0.034,
+    "n_obs": 4748,
+    "n_buurten": 1572,
+    "n_wijken": 869,
+    "n_gemeenten": 295,
+    "note": "Python uses buurt as primary grouping with wijk/gemeente as fixed effects"
+  },
+  "h3_test": {
+    "main_effect_coef": 0.217,
+    "main_effect_se": 0.949,
+    "interaction_coef": 0.181,
+    "interaction_se": 0.343,
+    "interaction_pvalue": 0.598,
+    "significant": false,
+    "interpretation": "H3 NOT SUPPORTED: No significant cross-level interaction",
+    "simple_slopes": {
+      "low_wealth": {
+        "effect": -0.145,
+        "description": "Effect at wealth_index=0 (low wealth)"
+      },
+      "high_wealth": {
+        "effect": 0.579,
+        "description": "Effect at wealth_index=4 (high wealth)"
+      }
+    }
+  },
+  "sensitivity": {
+    "base": {
+      "name": "Base (DV_single)",
+      "coef": 0.276,
+      "se": 0.947,
+      "significant": false
+    },
+    "two_item": {
+      "name": "2-item DV",
+      "coef": 0.312,
+      "se": 0.891,
+      "significant": false
+    },
+    "three_item": {
+      "name": "3-item DV",
+      "coef": 0.287,
+      "se": 0.823,
+      "significant": false
+    },
+    "dutch_only": {
+      "name": "Dutch-born only",
+      "coef": 0.189,
+      "se": 1.012,
+      "significant": false
+    },
+    "income_ratio": {
+      "name": "Income Ratio",
+      "coef": -1.841,
+      "se": 0.892,
+      "significant": true
+    }
+  },
+  "hypotheses": {
+    "h1": {
+      "name": "Neighborhood Inequality Effect",
+      "description": "Neighborhoods with higher income inequality -> more support for redistribution",
+      "result": "NOT SUPPORTED",
+      "evidence": "Effect non-significant after controls (beta=0.28, p>0.05)"
+    },
+    "h2": {
+      "name": "Geographic Level Comparison",
+      "description": "Neighborhood effects > municipality effects",
+      "result": "INCONCLUSIVE",
+      "evidence": "Effects weak at all levels (ICC ~1-2% at each level)"
+    },
+    "h3": {
+      "name": "Income Moderation",
+      "description": "Individual income moderates neighborhood effect",
+      "result": "NOT SUPPORTED",
+      "evidence": "Interaction non-significant (beta=0.18, p=0.60)"
+    }
+  },
+  "nested_random_effects": {
+    "note": "R-specific: True nested random effects using lme4",
+    "icc_gemeente": 0.012,
+    "icc_wijk": 0.008,
+    "icc_buurt": 0.014,
+    "icc_individual": 0.966,
+    "interpretation": "Variance overwhelmingly at individual level (~97%)"
+  },
+  "metadata": {
+    "data_source": "SCoRE Netherlands 2017",
+    "admin_data": "CBS StatLine Table 84286NED (2018)",
+    "last_updated": "2025-02",
+    "pipeline_version": "1.0"
+  }
+}

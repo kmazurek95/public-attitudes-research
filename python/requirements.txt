@@ -1,0 +1,33 @@
+# Redistribution Preferences Analysis - Python Dependencies
+# Install with: pip install -r requirements.txt
+
+# Data manipulation
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Data loading
+pyreadstat>=1.2.0        # Read Stata .dta files
+
+# CBS API
+cbsodata>=1.3.0          # CBS StatLine API (Statistics Netherlands)
+
+# Statistical modeling
+statsmodels>=0.14.0      # Mixed effects / multilevel models
+scipy>=1.11.0            # Statistical functions
+
+# Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Reporting
+tabulate>=0.9.0          # Table formatting
+jinja2>=3.1.0            # HTML report templates
+
+# Dashboard
+streamlit>=1.30.0        # Interactive web dashboard
+plotly>=5.18.0           # Interactive visualizations
+
+# Geographic/Mapping (optional - for map visualizations)
+geopandas>=0.14.0        # Geographic data handling
+folium>=0.15.0           # Interactive maps
+mapclassify>=2.6.0       # Map classification schemes

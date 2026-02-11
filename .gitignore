@@ -1,0 +1,113 @@
+# =============================================================================
+# Data files (SENSITIVE - never upload to GitHub)
+# =============================================================================
+# Survey data (contains personal/geographic identifiers)
+*.dta
+*.sav
+score*
+*score*
+
+# Excel files
+*.xlsx
+*.xls
+
+# R data files
+*.RData
+*.rds
+
+# Other data formats
+*.parquet
+
+# Legacy data directories
+02_data_orig/
+03_data_final/
+processed_*/
+legacy/**/data/
+legacy/**/*.dta
+legacy/**/*.csv
+
+# Raw data directory (contains sensitive survey data)
+data/raw/
+
+# Block CSV files EXCEPT specific allowed ones
+*.csv
+!data/processed/analysis_ready.csv
+!python/dashboard/data/*.csv
+
+# Shapefiles and geographic data (large files)
+python/data/
+*.shp
+*.shx
+*.dbf
+*.prj
+*.sbn
+*.sbx
+*.gpkg
+*.zip
+
+# =============================================================================
+# Python
+# =============================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+*.egg-info/
+.eggs/
+*.egg
+.venv/
+venv/
+ENV/
+
+# =============================================================================
+# R
+# =============================================================================
+.Rhistory
+.Rapp.history
+.RData
+.RDataTmp
+.Ruserdata
+_targets/
+.Rproj.user/
+*-Ex.R
+/*.tar.gz
+/*.Rcheck/
+*_cache/
+/cache/
+*.utf8.md
+*.knit.md
+.Renviron
+.httr-oauth
+
+# =============================================================================
+# Jupyter
+# =============================================================================
+.ipynb_checkpoints/
+*_executed.ipynb
+
+# =============================================================================
+# IDE / Editor
+# =============================================================================
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# =============================================================================
+# OS
+# =============================================================================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =============================================================================
+# Output files (regenerable from code)
+# =============================================================================
+outputs/
+
+# =============================================================================
+# Deprecated folders (kept for reference but not tracked)
+# =============================================================================
+redistribution_analysis_python/
+archive/
+Public Attitudes Research.Rproj

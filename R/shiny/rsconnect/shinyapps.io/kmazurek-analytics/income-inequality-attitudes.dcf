@@ -1,0 +1,10 @@
+name: income-inequality-attitudes
+title:
+username: kmazurek-analytics
+account: kmazurek-analytics
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 16567444
+bundleId: 11529642
+url: https://kmazurek-analytics.shinyapps.io/income-inequality-attitudes/
+version: 1

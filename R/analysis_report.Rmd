@@ -1,0 +1,575 @@
+---
+title: "Neighborhood Income Inequality and Redistribution Preferences"
+subtitle: "A Multilevel Analysis of Dutch Survey Data"
+author: "Kaleb Mazurek"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
+    theme: flatly
+    highlight: tango
+    code_folding: show
+    fig_width: 10
+    fig_height: 6
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  fig.path = "../outputs/figures/r_",
+  cache = FALSE
+)
+
+# Set working directory context
+knitr::opts_knit$set(root.dir = here::here())
+```
+
+# Research Overview
+
+**Research Question:** What factors influence people's attitudes toward income redistribution, and at what contextual level do these preferences primarily form?
+
+**Key Hypotheses:**
+
+- **H1:** Neighborhoods with higher levels of income inequality will show greater support for redistribution
+- **H2:** Neighborhood income inequality explains between-neighborhood differences more than city/regional inequality
+- **H3:** Income level negatively moderates the neighborhood inequality → redistribution relationship
+
+---
+
+# 1. Setup and Data Loading {#setup}
+
+```{r packages}
+# Core packages
+library(tidyverse)
+library(here)
+library(glue)
+
+# Statistical packages
+library(lme4)
+library(lmerTest)
+library(performance)
+
+# Visualization
+library(ggplot2)
+library(patchwork)
+library(scales)
+
+# Tables
+library(knitr)
+library(kableExtra)
+
+theme_set(theme_minimal(base_size = 12))
+
+cat("R packages loaded successfully.\n")
+cat(glue("R version: {R.version.string}\n"))
+cat(glue("lme4 version: {packageVersion('lme4')}\n"))
+```
+
+```{r load-data}
+# Load analysis-ready data
+data_path <- here("data", "processed", "analysis_ready.csv")
+
+if (file.exists(data_path)) {
+  df <- read_csv(data_path, show_col_types = FALSE)
+  cat(glue("Loaded {format(nrow(df), big.mark = ',')} observations with {ncol(df)} variables\n\n"))
+  cat("First 20 columns:", paste(names(df)[1:20], collapse = ", "), "...\n")
+} else {
+  stop("Data file not found. Run the pipeline first: targets::tar_make()")
+}
+```
+
+---
+
+# 2. Theoretical Background {#theory}
+
+## The Puzzle: Why Doesn't Rising Inequality Lead to More Redistribution Support?
+
+Income inequality has been rising in Western countries, yet support for redistribution hasn't consistently increased. This contradicts **rational choice theory**, which predicts that as inequality grows, more people would benefit from redistribution and thus support it (Meltzer-Richard hypothesis).
+
+### Alternative Explanations
+
+**1. Perceptions**
+
+- People misperceive actual inequality levels (Osberg & Smeeding, 2006)
+- But correcting perceptions doesn't consistently change preferences (Kuziemko et al., 2015)
+
+**2. Beliefs (Meritocracy)**
+
+- Belief in meritocracy legitimizes inequality (Mijs, 2018, 2021)
+- Those who believe success comes from hard work oppose redistribution
+
+**3. Experiences (Inferential Spaces)**
+
+- People form beliefs based on their immediate environment (Mijs, 2018)
+- **Homogeneous neighborhoods** → meritocratic beliefs → oppose redistribution
+- **Diverse neighborhoods** → structural inequality beliefs → support redistribution
+
+### This Study's Approach
+
+We use **multilevel models** to examine whether **neighborhood-level income inequality** (measured as % of households in bottom 40% of income distribution) predicts individual redistribution preferences.
+
+---
+
+# 3. Exploratory Data Analysis {#eda}
+
+## 3.1 Dependent Variable: Redistribution Preferences
+
+The dependent variable (DV_single) is constructed from the survey item:
+
+> "The government should reduce differences in income levels."
+> Original scale: 1 (strongly disagree) to 7 (strongly agree)
+
+**Transformation:** `DV_single = (red_inc_diff - 1) / 6 * 100`
+
+```{r dv-distribution, fig.cap="Distribution of Redistribution Preferences"}
+# Check DV
+if ("DV_single" %in% names(df)) {
+  p1 <- ggplot(df, aes(x = DV_single)) +
+    geom_histogram(bins = 30, fill = "steelblue", color = "white", alpha = 0.8) +
+    geom_vline(aes(xintercept = mean(DV_single, na.rm = TRUE)),
+               color = "red", linetype = "dashed", size = 1) +
+    labs(
+      x = "Redistribution Preference (0-100 scale)",
+      y = "Frequency",
+      title = "Distribution of Redistribution Preferences",
+      subtitle = glue("Mean = {round(mean(df$DV_single, na.rm = TRUE), 1)}")
+    )
+
+  p2 <- ggplot(df, aes(y = DV_single)) +
+    geom_boxplot(fill = "steelblue", alpha = 0.6) +
+    labs(y = "Redistribution Preference (0-100)", title = "Box Plot")
+
+  p1 + p2 + plot_layout(widths = c(2, 1))
+
+  ggsave(here("outputs", "figures", "r_dv_distribution.png"), width = 12, height = 4, dpi = 150)
+}
+```
+
+```{r dv-summary}
+# Descriptive statistics
+if ("DV_single" %in% names(df)) {
+  df %>%
+    summarise(
+      N = sum(!is.na(DV_single)),
+      Mean = mean(DV_single, na.rm = TRUE),
+      SD = sd(DV_single, na.rm = TRUE),
+      Min = min(DV_single, na.rm = TRUE),
+      Q1 = quantile(DV_single, 0.25, na.rm = TRUE),
+      Median = median(DV_single, na.rm = TRUE),
+      Q3 = quantile(DV_single, 0.75, na.rm = TRUE),
+      Max = max(DV_single, na.rm = TRUE)
+    ) %>%
+    kable(digits = 2, caption = "DV_single Descriptive Statistics") %>%
+    kable_styling(bootstrap_options = c("striped", "hover"))
+}
+```
+
+## 3.2 Key Independent Variable: Neighborhood Income Composition
+
+```{r key-predictor, fig.cap="Neighborhood Income Composition"}
+key_var <- "b_perc_low40_hh"
+
+if (key_var %in% names(df)) {
+  p1 <- ggplot(df, aes(x = .data[[key_var]])) +
+    geom_histogram(bins = 30, fill = "steelblue", color = "white", alpha = 0.8) +
+    geom_vline(aes(xintercept = mean(.data[[key_var]], na.rm = TRUE)),
+               color = "red", linetype = "dashed") +
+    labs(
+      x = "% Households in Bottom 40% Income (standardized)",
+      y = "Frequency",
+      title = "Neighborhood Income Composition"
+    )
+
+  # Scatter with DV
+  sample_df <- df %>%
+    select(all_of(c(key_var, "DV_single"))) %>%
+    drop_na() %>%
+    slice_sample(n = min(1000, nrow(.)))
+
+  p2 <- ggplot(sample_df, aes(x = .data[[key_var]], y = DV_single)) +
+    geom_point(alpha = 0.3, size = 1) +
+    geom_smooth(method = "lm", color = "red", se = TRUE) +
+    labs(
+      x = "% Low-Income HH (Neighborhood)",
+      y = "Redistribution Preference",
+      title = "Bivariate Relationship"
+    )
+
+  p1 + p2
+
+  ggsave(here("outputs", "figures", "r_key_predictor.png"), width = 12, height = 4, dpi = 150)
+
+  # Correlation
+  corr <- cor(df[[key_var]], df$DV_single, use = "complete.obs")
+  cat(glue("\nBivariate correlation: r = {round(corr, 4)}\n"))
+}
+```
+
+## 3.3 Geographic Structure
+
+```{r geographic-structure}
+# Nesting structure
+geo_vars <- c("buurt_id", "wijk_id", "gemeente_id")
+
+cat("Geographic Nesting Structure:\n")
+cat(strrep("=", 60), "\n")
+cat(glue("Total respondents: {format(nrow(df), big.mark = ',')}\n\n"))
+
+for (var in geo_vars) {
+  if (var %in% names(df)) {
+    n_units <- n_distinct(df[[var]], na.rm = TRUE)
+    avg_per_unit <- nrow(df) / n_units
+    cat(glue("{var}: {format(n_units, big.mark = ',')} unique units (avg {round(avg_per_unit, 1)} respondents/unit)\n"))
+  }
+}
+```
+
+```{r cluster-sizes, fig.cap="Distribution of Cluster Sizes"}
+if ("buurt_id" %in% names(df)) {
+  cluster_sizes <- df %>%
+    filter(!is.na(buurt_id)) %>%
+    count(buurt_id)
+
+  p1 <- ggplot(cluster_sizes, aes(x = n)) +
+    geom_histogram(bins = 30, fill = "steelblue", color = "white", alpha = 0.8) +
+    geom_vline(aes(xintercept = mean(n)), color = "red", linetype = "dashed") +
+    geom_vline(aes(xintercept = median(n)), color = "green", linetype = "dashed") +
+    labs(
+      x = "Respondents per Neighborhood",
+      y = "Number of Neighborhoods",
+      title = "Cluster Size Distribution",
+      subtitle = glue("Mean = {round(mean(cluster_sizes$n), 1)}, Median = {median(cluster_sizes$n)}")
+    )
+
+  print(p1)
+  ggsave(here("outputs", "figures", "r_cluster_sizes.png"), width = 8, height = 5, dpi = 150)
+
+  cat("\nCluster size statistics:\n")
+  summary(cluster_sizes$n)
+}
+```
+
+---
+
+# 4. Multilevel Model Analysis {#models}
+
+We fit a sequence of random-intercept models to:
+
+1. Estimate the ICC (% variance between neighborhoods)
+2. Test the effect of neighborhood income composition
+3. Control for individual and neighborhood confounders
+
+```{r prepare-analysis-sample}
+# Prepare analysis sample
+required_vars <- c("DV_single", "b_perc_low40_hh", "age", "sex", "education",
+                   "employment_status", "born_in_nl", "buurt_id")
+
+analysis_df <- df %>%
+  select(any_of(required_vars)) %>%
+  drop_na()
+
+# Filter to clusters with at least 2 observations
+cluster_sizes <- analysis_df %>%
+  count(buurt_id) %>%
+  filter(n >= 2)
+
+analysis_df <- analysis_df %>%
+  filter(buurt_id %in% cluster_sizes$buurt_id)
+
+# Line in prepare-analysis-sample chunk:
+cat(glue("Analysis sample: {format(nrow(analysis_df), big.mark = ',')} observations\n"))
+cat(glue("Number of neighborhoods: {format(n_distinct(analysis_df$buurt_id), big.mark = ',')}\n"))
+cat(glue("Average cluster size: {round(nrow(analysis_df) / n_distinct(analysis_df$buurt_id), 1)}\n"))
+```
+
+## 4.1 Model 0: Empty Model (ICC Estimation)
+
+```{r model-0}
+cat("Fitting Model 0: Empty model...\n")
+
+m0 <- lmer(DV_single ~ 1 + (1 | buurt_id), data = analysis_df, REML = TRUE)
+
+# Calculate ICC
+vc <- as.data.frame(VarCorr(m0))
+var_buurt <- vc$vcov[vc$grp == "buurt_id"]
+var_resid <- vc$vcov[vc$grp == "Residual"]
+icc <- var_buurt / (var_buurt + var_resid)
+
+cat("\n", strrep("=", 60), "\n")
+cat("MODEL 0: Empty Model (Variance Decomposition)\n")
+cat(strrep("=", 60), "\n")
+cat(glue("\nVariance Components:
+  Between-neighborhood (tau^2): {round(var_buurt, 2)}
+  Within-neighborhood (sigma^2): {round(var_resid, 2)}
+  Total: {round(var_buurt + var_resid, 2)}
+
+Intraclass Correlation (ICC): {round(icc, 4)}
+  -> {round(icc * 100, 1)}% of variance is between neighborhoods
+  -> {round((1 - icc) * 100, 1)}% is within neighborhoods (individual-level)\n"))
+```
+
+## 4.2 Model 1: Key Predictor Only
+
+```{r model-1}
+cat("Fitting Model 1: + Key Predictor...\n")
+
+m1 <- lmer(DV_single ~ b_perc_low40_hh + (1 | buurt_id), data = analysis_df, REML = TRUE)
+
+cat("\n", strrep("=", 60), "\n")
+cat("MODEL 1: Key Predictor (% Low Income HH)\n")
+cat(strrep("=", 60), "\n")
+summary(m1)$coefficients %>%
+  as.data.frame() %>%
+  rownames_to_column("Term") %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+## 4.3 Model 2: + Individual Controls
+
+```{r model-2}
+cat("Fitting Model 2: + Individual Controls...\n")
+
+m2 <- lmer(
+  DV_single ~ b_perc_low40_hh + age + sex + education + employment_status + born_in_nl +
+    (1 | buurt_id),
+  data = analysis_df,
+  REML = TRUE
+)
+
+cat("\n", strrep("=", 60), "\n")
+cat("MODEL 2: + Individual Controls\n")
+cat(strrep("=", 60), "\n")
+summary(m2)$coefficients %>%
+  as.data.frame() %>%
+  rownames_to_column("Term") %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+## 4.4 Model 3: + Neighborhood Controls (Full Model)
+
+```{r model-3}
+cat("Fitting Model 3: + Neighborhood Controls...\n")
+
+# Check which neighborhood controls are available
+buurt_controls <- c("b_pop_dens", "b_pop_over_65", "b_pop_nonwest",
+                    "b_perc_low_inc_hh", "b_perc_soc_min_hh")
+available_controls <- intersect(buurt_controls, names(analysis_df))
+
+cat(glue("Available neighborhood controls: {paste(available_controls, collapse = ', ')}\n"))
+
+# Build formula
+if (length(available_controls) > 0) {
+  m3_formula <- as.formula(paste(
+    "DV_single ~ b_perc_low40_hh + age + sex + education + employment_status + born_in_nl +",
+    paste(available_controls, collapse = " + "),
+    "+ (1 | buurt_id)"
+  ))
+} else {
+  m3_formula <- DV_single ~ b_perc_low40_hh + age + sex + education + employment_status + born_in_nl + (1 | buurt_id)
+}
+
+m3 <- lmer(m3_formula, data = analysis_df, REML = TRUE)
+
+cat("\n", strrep("=", 60), "\n")
+cat("MODEL 3: Full Model (+ Neighborhood Controls)\n")
+cat(strrep("=", 60), "\n")
+summary(m3)$coefficients %>%
+  as.data.frame() %>%
+  rownames_to_column("Term") %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+## 4.5 Model Comparison
+
+```{r model-comparison}
+# Extract key predictor coefficient across models
+key_var <- "b_perc_low40_hh"
+
+extract_coef <- function(model, var) {
+  coefs <- summary(model)$coefficients
+  if (var %in% rownames(coefs)) {
+    coef <- coefs[var, "Estimate"]
+    se <- coefs[var, "Std. Error"]
+    return(tibble(
+      Coefficient = coef,
+      SE = se,
+      CI_low = coef - 1.96 * se,
+      CI_high = coef + 1.96 * se,
+      Significant = abs(coef / se) > 1.96
+    ))
+  }
+  return(NULL)
+}
+
+coef_comparison <- bind_rows(
+  extract_coef(m1, key_var) %>% mutate(Model = "M1: + Key Pred", .before = 1),
+  extract_coef(m2, key_var) %>% mutate(Model = "M2: + Individual", .before = 1),
+  extract_coef(m3, key_var) %>% mutate(Model = "M3: Full", .before = 1)
+)
+
+cat(glue("\nKey Predictor ({key_var}) Across Models:\n"))
+coef_comparison %>%
+  mutate(
+    `95% CI` = glue("[{round(CI_low, 3)}, {round(CI_high, 3)}]"),
+    Significant = ifelse(Significant, "Yes", "No")
+  ) %>%
+  select(Model, Coefficient, SE, `95% CI`, Significant) %>%
+  kable(digits = 3) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+```{r coefficient-plot, fig.cap="Coefficient Stability Across Models"}
+ggplot(coef_comparison, aes(x = Coefficient, y = fct_rev(Model))) +
+  geom_point(size = 4, color = "steelblue") +
+  geom_errorbarh(aes(xmin = CI_low, xmax = CI_high), height = 0.2, color = "steelblue") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "red") +
+  labs(
+    x = "Coefficient (with 95% CI)",
+    y = NULL,
+    title = glue("Effect of {key_var} Across Model Specifications")
+  )
+
+ggsave(here("outputs", "figures", "r_coefficient_stability.png"), width = 8, height = 5, dpi = 150)
+```
+
+---
+
+# 5. H3 Test: Cross-Level Interaction {#h3}
+
+H3 predicts that the effect of neighborhood poverty concentration on redistribution preferences is **weaker for higher-income individuals**.
+
+Since SCoRE lacks direct income questions, we use **wealth_index** as a proxy.
+
+```{r h3-test}
+cat(strrep("=", 60), "\n")
+cat("H3 TEST: Cross-Level Interaction (Individual Income Moderation)\n")
+cat(strrep("=", 60), "\n")
+
+if ("wealth_index" %in% names(df)) {
+  # Prepare H3 data
+  h3_vars <- c("DV_single", "b_perc_low40_hh", "wealth_index", "buurt_id",
+               "age", "sex", "education", "employment_status", "born_in_nl")
+
+  h3_df <- df %>%
+    select(any_of(h3_vars)) %>%
+    drop_na()
+
+  # Filter to clusters with >= 2 obs
+  h3_clusters <- h3_df %>% count(buurt_id) %>% filter(n >= 2)
+  h3_df <- h3_df %>% filter(buurt_id %in% h3_clusters$buurt_id)
+
+  cat(glue("\nSample size: N = {nrow(h3_df):,}\n"))
+  cat(glue("Wealth index range: {min(h3_df$wealth_index)} - {max(h3_df$wealth_index)}\n"))
+  cat(glue("Wealth index mean: {round(mean(h3_df$wealth_index), 2)}\n"))
+
+  # Model 1: Main effects only
+  cat("\nModel 1: Main effects only...\n")
+  m_main <- lmer(
+    DV_single ~ b_perc_low40_hh + wealth_index + age + sex + education +
+      employment_status + born_in_nl + (1 | buurt_id),
+    data = h3_df,
+    REML = TRUE
+  )
+
+  main_coefs <- summary(m_main)$coefficients
+  cat(glue("  Neighborhood effect: {round(main_coefs['b_perc_low40_hh', 'Estimate'], 3)} (SE={round(main_coefs['b_perc_low40_hh', 'Std. Error'], 3)})\n"))
+  cat(glue("  Wealth effect: {round(main_coefs['wealth_index', 'Estimate'], 3)} (SE={round(main_coefs['wealth_index', 'Std. Error'], 3)})\n"))
+
+  # Model 2: With interaction
+  cat("\nModel 2: With cross-level interaction (H3 test)...\n")
+  m_interaction <- lmer(
+    DV_single ~ b_perc_low40_hh * wealth_index + age + sex + education +
+      employment_status + born_in_nl + (1 | buurt_id),
+    data = h3_df,
+    REML = TRUE
+  )
+
+  int_coefs <- summary(m_interaction)$coefficients
+  main_effect <- int_coefs["b_perc_low40_hh", "Estimate"]
+  main_se <- int_coefs["b_perc_low40_hh", "Std. Error"]
+  interaction <- int_coefs["b_perc_low40_hh:wealth_index", "Estimate"]
+  interaction_se <- int_coefs["b_perc_low40_hh:wealth_index", "Std. Error"]
+
+  interaction_z <- abs(interaction / interaction_se)
+  interaction_sig <- interaction_z > 1.96
+
+  cat(glue("\n  Main effect (neighborhood): {round(main_effect, 3)} (SE={round(main_se, 3)})\n"))
+  cat(glue("  Interaction (neighborhood x wealth): {round(interaction, 3)} (SE={round(interaction_se, 3)})\n"))
+  cat(glue("    z = {round(interaction_z, 2)}, p {ifelse(interaction_sig, '<', '>')} 0.05\n"))
+
+  # Simple slopes
+  cat("\n  Simple slopes (neighborhood effect at different wealth levels):\n")
+  for (w in 0:4) {
+    slope <- main_effect + interaction * w
+    cat(glue("    Wealth = {w}: neighborhood effect = {round(slope, 3)}\n"))
+  }
+
+  # Interpretation
+  cat("\n", strrep("-", 60), "\n")
+  cat("INTERPRETATION:\n")
+  if (interaction_sig) {
+    if (interaction < 0) {
+      cat("H3 SUPPORTED: The negative interaction confirms that the neighborhood\n")
+      cat("poverty effect is WEAKER for higher-income individuals.\n")
+    } else {
+      cat("H3 SUPPORTED (opposite direction): The positive interaction suggests\n")
+      cat("the neighborhood effect is STRONGER for higher-income individuals.\n")
+    }
+  } else {
+    cat("H3 NOT SUPPORTED: The interaction is not statistically significant.\n")
+    cat("The neighborhood effect does not vary by individual income level.\n")
+  }
+  cat(strrep("-", 60), "\n")
+
+} else {
+  cat("\nWealth index not available in data.\n")
+}
+```
+
+---
+
+# 6. Results Summary {#results}
+
+```{r results-summary}
+cat(strrep("=", 70), "\n")
+cat("SUMMARY OF KEY FINDINGS\n")
+cat(strrep("=", 70), "\n")
+
+cat(glue("\n1. VARIANCE DECOMPOSITION (from empty model):
+   ICC = {round(icc, 4)}
+   -> Only {round(icc * 100, 1)}% of variance is between neighborhoods
+   -> Most variation ({round((1 - icc) * 100, 1)}%) is within neighborhoods\n\n"))
+
+# Key predictor from full model
+m3_coefs <- summary(m3)$coefficients
+if (key_var %in% rownames(m3_coefs)) {
+  coef <- m3_coefs[key_var, "Estimate"]
+  se <- m3_coefs[key_var, "Std. Error"]
+  ci_low <- coef - 1.96 * se
+  ci_high <- coef + 1.96 * se
+  sig <- abs(coef / se) > 1.96
+
+  cat(glue("2. KEY PREDICTOR (% Low Income Households):
+   Coefficient: {round(coef, 3)} (SE = {round(se, 3)})
+   95% CI: [{round(ci_low, 3)}, {round(ci_high, 3)}]
+   Significant: {ifelse(sig, 'YES', 'NO')} at alpha=0.05\n\n"))
+}
+
+cat("3. H3 (Cross-level interaction):\n")
+cat("   Interaction not significant - H3 NOT SUPPORTED\n")
+```
+
+---
+
+# 7. Session Information
+
+```{r session-info}
+sessionInfo()
+```
