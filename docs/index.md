@@ -67,7 +67,7 @@ Supporting documentation and original sources.
 
 ## Live Dashboards
 
-- **Python (Streamlit)**: [attitudes-toward-income-inequality.streamlit.app](https://attitudes-toward-income-inequality-7unora4rhffxtelwombehc.streamlit.app)
+- **Python (Streamlit)**: [public-attitudes-research.streamlit.app](https://public-attitudes-research-zcx3tbf4verisz7pavqgzb.streamlit.app/)
 - **R (Shiny)**: [kmazurek-analytics.shinyapps.io/income-inequality-attitudes](https://kmazurek-analytics.shinyapps.io/income-inequality-attitudes/)
 
 ---

@@ -150,6 +150,6 @@ During my internship at the University of Amsterdam, I built a complete data sci
 
 ## Live Demos
 
-- **Python Dashboard:** [Streamlit app](https://attitudes-toward-income-inequality-7unora4rhffxtelwombehc.streamlit.app)
+- **Python Dashboard:** [Streamlit app](https://public-attitudes-research-zcx3tbf4verisz7pavqgzb.streamlit.app/)
 - **R Dashboard:** [Shiny app](https://kmazurek-analytics.shinyapps.io/income-inequality-attitudes/)
 - **Repository:** [github.com/kmazurek95/public-attitudes-research](https://github.com/kmazurek95/public-attitudes-research)

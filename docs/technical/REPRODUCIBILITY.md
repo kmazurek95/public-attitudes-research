@@ -10,7 +10,7 @@ If you just want to explore the results without running the full pipeline:
 
 ### Python Dashboard
 ```bash
-git clone https://github.com/[username]/public-attitudes-research.git
+git clone https://github.com/kmazurek95/public-attitudes-research.git
 cd public-attitudes-research
 pip install -r python/requirements.txt
 streamlit run python/dashboard/app.py
@@ -116,7 +116,7 @@ cbsodata.get_data("84286NED")
 ### Step 1: Clone Repository
 
 ```bash
-git clone https://github.com/[username]/public-attitudes-research.git
+git clone https://github.com/kmazurek95/public-attitudes-research.git
 cd public-attitudes-research
 ```
 

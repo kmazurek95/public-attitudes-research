@@ -72,7 +72,7 @@ This study provides an empirical test of Mijs' (2018) "inferential spaces" hypot
 
 ## Live Demos
 
-- **Python Dashboard (Streamlit)**: [attitudes-toward-income-inequality.streamlit.app](https://attitudes-toward-income-inequality-7unora4rhffxtelwombehc.streamlit.app)
+- **Python Dashboard (Streamlit)**: [public-attitudes-research.streamlit.app](https://public-attitudes-research-zcx3tbf4verisz7pavqgzb.streamlit.app/)
 - **R Dashboard (Shiny)**: [kmazurek-analytics.shinyapps.io/income-inequality-attitudes](https://kmazurek-analytics.shinyapps.io/income-inequality-attitudes/)
 
 Both dashboards present interactive visualizations of the analysis with precomputed results.

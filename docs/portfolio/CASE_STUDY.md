@@ -140,7 +140,7 @@ Bivariate:    β = 3.46 *** (significant)
 
 | Deliverable | Description |
 |-------------|-------------|
-| **Python Dashboard** | [Streamlit app](https://attitudes-toward-income-inequality-7unora4rhffxtelwombehc.streamlit.app) with interactive results |
+| **Python Dashboard** | [Streamlit app](https://public-attitudes-research-zcx3tbf4verisz7pavqgzb.streamlit.app/) with interactive results |
 | **R Dashboard** | [Shiny app](https://kmazurek-analytics.shinyapps.io/income-inequality-attitudes/) with nested RE results |
 | **Academic Paper** | Full manuscript draft ([DRAFT_PAPER.md](../academic/DRAFT_PAPER.md)) |
 | **Documentation** | Literature review, limitations, technical overview |

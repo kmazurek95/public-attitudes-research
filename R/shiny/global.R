@@ -216,7 +216,7 @@ PYTHON_DASHBOARD_URL_LOCAL <- "http://localhost:8501"
 R_DASHBOARD_URL_LOCAL <- "http://localhost:3838"
 
 # Production URLs (update after deployment)
-PYTHON_DASHBOARD_URL_PROD <- "https://attitudes-toward-income-inequality-7unora4rhffxtelwombehc.streamlit.app"
+PYTHON_DASHBOARD_URL_PROD <- "https://public-attitudes-research-zcx3tbf4verisz7pavqgzb.streamlit.app/"
 R_DASHBOARD_URL_PROD <- "https://kmazurek-analytics.shinyapps.io/income-inequality-attitudes/"
 
 # Use production URLs if available, otherwise local
