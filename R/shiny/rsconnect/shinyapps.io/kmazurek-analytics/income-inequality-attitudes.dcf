@@ -5,6 +5,8 @@ account: kmazurek-analytics
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 16567444
-bundleId: 11529642
+bundleId: 11570148
 url: https://kmazurek-analytics.shinyapps.io/income-inequality-attitudes/
 version: 1
+asMultiple: FALSE
+asStatic: FALSE
