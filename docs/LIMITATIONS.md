@@ -2,6 +2,9 @@
 
 ## Data
 
+Survey data come from SCoRE, *Sub-national Context and Radical Right Support in Europe*. The
+Netherlands sample was fielded in 2017 by the data provider GfK and is restricted-use.
+
 SCoRE 2017 is cross-sectional. It observes neighbourhood composition and attitudes at the same
 moment, so the results are associations rather than causal effects: temporal ordering is
 unobserved, and residential self-selection on pre-existing preferences cannot be ruled out.
@@ -10,8 +13,8 @@ Cluster sizes are small. The survey averages roughly 3 respondents per buurt, wi
 clusters. This reduces the precision of the random-effects estimates, inflates standard errors on
 neighbourhood-level predictors, and limits power. The ICC should be read as a lower bound.
 
-The survey and the administrative data come from different years: the survey is 2017, the CBS
-indicators are 2018. Neighbourhood characteristics change slowly, so the expected impact is small.
+The survey and the administrative data are from the same year: the CBS indicators are table
+83765NED, *Kerncijfers wijken en buurten* 2017, matching the 2017 fielding.
 
 Several variables are unavailable. There is no direct individual income measure, so a wealth proxy
 built from asset ownership stands in. Residential tenure is not measured, so exposure duration is
@@ -19,19 +22,27 @@ unknown. Meritocratic belief, a candidate mediator, is not measured.
 
 ## Geography
 
-About 89% of respondents match an administrative buurt at the neighbourhood level. The cause is
-data vintage, not a code defect. SCoRE was fielded in 2017; the CBS administrative table (84286NED)
-is 2018. Around 316 well-formed survey buurten and ~10 gemeenten have no counterpart in the 2018
-table, because Dutch neighbourhood renumbering and municipal mergers occurred between the two
-years. Only a survey-year CBS table would close this gap; no change to the derivation code can.
+About 89% of respondents match an administrative buurt at the neighbourhood level. The cause is not
+data vintage: the administrative table is CBS 83765NED, *Kerncijfers wijken en buurten* 2017, the
+same year the survey was fielded, so the survey-year table is already in use and does not close the
+gap.
+
+Of the 4,043 distinct well-formed survey buurtcodes, 311 appear in neither the 2017 nor the 2018
+CBS table — 236 with a valid gemeente code but a buurt code CBS has never published, and 75 in
+gemeenten retired before 2017. A further 5 are lost to a defect in the local CBS export, which
+leaves all ten buurt rows for Nuenen, Gerwen en Nederwetten (GM0820) blank although CBS publishes
+them in both years. Reconciling the 311 would require a CBS buurt-code crosswalk across years,
+which is not attempted here; no change to the derivation code reaches them.
+
 Cases that fail to match are dropped by listwise deletion, so the analysis sample is not a random
 subset of respondents.
 
 The identifier derivation issue is resolved. Padding in `create_geo_ids` was corrected to
 `sprintf("%08d", ...)`; the previous approach corrupted round-numbered codes via scientific
-notation. This affected 5 of 7,987 codes and 2 gemeente codes. Estimates are unchanged to three
-decimal places. See [`outputs/MODELS_SUMMARY_fixed.md`](../outputs/MODELS_SUMMARY_fixed.md) for the
-before/after comparison.
+notation. This affected 5 of 7,987 codes and 2 gemeente codes, and moved M3 by +0.071 (1.128 →
+1.199, p 0.237 → 0.207). The conclusion is unchanged; the estimates are not. See
+[`outputs/MODELS_SUMMARY_fixed.md`](../outputs/MODELS_SUMMARY_fixed.md) for the before/after
+comparison.
 
 Administrative units are not social ones. Buurten (~500–2,000 residents) may be smaller than the
 areas residents themselves treat as their neighbourhood, and estimates may differ at other levels

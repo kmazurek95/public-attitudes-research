@@ -67,7 +67,9 @@ return(survey)
 
 #' Load CBS Administrative Indicators
 #'
-#' Loads CBS neighborhood indicators (table 84286NED) from a local CSV export.
+#' Loads CBS neighborhood indicators (table 83765NED, Kerncijfers wijken en buurten
+#' 2017 -- the survey year) from a local CSV export. The column positions below
+#' follow that table's layout.
 #'
 #' @param path Path to local CSV file
 #' @return A tibble with administrative indicators at all geographic levels

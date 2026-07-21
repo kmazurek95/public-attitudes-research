@@ -94,8 +94,18 @@ notation-proof.
 
 ## Why the buurt match rate is ~89%
 
-The cause is data vintage rather than a code defect. SCoRE was fielded in 2017; the CBS
-administrative table (84286NED) is 2018. Roughly 316 well-formed survey buurten and ~10 gemeenten
-do not exist in the 2018 table because of Dutch neighbourhood renumbering and municipal mergers
-between the two years. This is addressable only by using a survey-year CBS table, not by any change
-to the derivation code. The padding correction above is a footnote by comparison.
+The administrative source is CBS table 83765NED, *Kerncijfers wijken en buurten* 2017 — the year
+SCoRE was fielded. The cause is therefore not a mismatch between the survey year and the
+administrative year: the survey-year table is already in use, and it does not close the gap.
+
+Of the 4,043 distinct well-formed survey buurtcodes, 311 appear in neither the 2017 nor the 2018
+CBS table, so no change of vintage recovers them. Of those, 236 carry a valid gemeente code but a
+buurt code CBS has never published, and 75 sit in gemeenten retired before 2017 (0241, 0381, 0424,
+0425, 0478, 0844, 0846, 0860, 1921). A further 5 survey buurten are lost to a defect in the local
+CBS export rather than to CBS itself: it leaves all ten buurt rows for Nuenen, Gerwen en
+Nederwetten (GM0820) blank, although CBS publishes them fully in both 2017 and 2018. Those two
+together are the 316 buurten and 10 gemeenten previously reported as unmatched, which were counted
+against the export rather than against CBS.
+
+Closing the remaining 311 would need a CBS buurt-code crosswalk across years, not a change to the
+derivation code. The padding correction above is a footnote by comparison.

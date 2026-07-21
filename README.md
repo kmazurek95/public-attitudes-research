@@ -8,7 +8,7 @@ the SCoRE Netherlands 2017 survey linked to CBS StatLine neighbourhood indicator
 
 The SCoRE survey data is restricted-use and is not included in this repository. Access is through
 the data provider, GfK, under its terms. N = 8,013. The CBS neighbourhood indicators (table
-84286NED, *Kerncijfers wijken en buurten* 2018) are open data.
+83765NED, *Kerncijfers wijken en buurten* 2017 — the survey year) are open data.
 
 ## What's here
 
@@ -38,7 +38,7 @@ anything else. It shows that the pipeline executes; it is not evidence for any r
 ## What the analysis found
 
 All estimates below are on the analysis sample: **N = 3,931 respondents in 1,382 buurten** —
-complete cases that match a 2018 CBS buurt, excluding singleton buurten. That is a subset of the
+complete cases that match a 2017 CBS buurt, excluding singleton buurten. That is a subset of the
 8,013 respondents surveyed, for the reasons in *Main limitation* below.
 
 Between-neighbourhood variance in support for redistribution is small. The empty model puts the ICC
@@ -61,12 +61,16 @@ A sensitivity specification that retains occupation and the collinear `b_perc_so
 
 ### Main limitation
 
-About 89% of respondents match to a 2018 CBS buurt. The cause is data vintage, not a code defect:
-SCoRE was fielded in 2017, and Dutch neighbourhood renumbering and municipal mergers occurred
-before the 2018 administrative table was compiled. Only a survey-year CBS table would close the
-gap. The identifier padding correction is a footnote by comparison; it affected 5 of 7,987 codes.
-Unmatched cases are dropped by listwise deletion, so the analysis sample is not a random subset of
-respondents.
+About 89% of respondents match to a 2017 CBS buurt. The cause is not a mismatch between the survey
+year and the administrative year: the survey-year table is already in use, and it does not close
+the gap. Of the 4,043 distinct well-formed survey buurtcodes, 311 appear in neither the 2017 nor
+the 2018 CBS table — codes renumbered or retired before the survey was fielded, 75 of them in
+gemeenten dissolved before 2017. A further 5 are lost to a defect in the local CBS export, which
+leaves all ten buurt rows for Nuenen, Gerwen en Nederwetten (GM0820) blank although CBS publishes
+them in both years. Closing the remainder would need a CBS buurt-code crosswalk across years, which
+is not attempted here. The identifier padding correction is a footnote by comparison; it affected
+5 of 7,987 codes. Unmatched cases are dropped by listwise deletion, so the analysis sample is not a
+random subset of respondents.
 
 ## Credit
 
