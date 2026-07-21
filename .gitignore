@@ -1,0 +1,12 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+_targets/
+*.csv
+*.dta
+*.rds
+*.RData
+data/
+r-pipeline-demo/data/
+r-pipeline-demo/results/
