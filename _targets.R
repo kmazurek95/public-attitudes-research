@@ -1,8 +1,10 @@
 # =============================================================================
 # _targets.R - Pipeline Definition
 # =============================================================================
-# Published as a record of the model specifications and variable construction;
-# not runnable — no data build step is included.
+# Published as a record of the model specifications and variable construction.
+# The underlying survey data are restricted under a data use agreement and are
+# not included, so this pipeline documents the analysis rather than executing
+# it; see r-pipeline-demo/ for a runnable version on simulated data.
 # =============================================================================
 
 library(targets)
